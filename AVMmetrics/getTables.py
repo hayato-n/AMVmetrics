@@ -12,7 +12,7 @@ from . import (
 )
 
 
-def _getTables(y_true, y_obs, metrics_list):
+def _getTables(y_true, y_pred, metrics_list):
     idx = pd.MultiIndex.from_arrays(
         [
             [m.metric_class for m in metrics_list],
@@ -28,7 +28,7 @@ def _getTables(y_true, y_obs, metrics_list):
 
     for m in metrics_list:
         ds.loc[(m.metric_class, m.abbreviation)] = (
-            m(y_true, y_obs),
+            m(y_true, y_pred),
             m.symmetry_bias,
             m.symmetry_dispersion,
         )
@@ -36,10 +36,10 @@ def _getTables(y_true, y_obs, metrics_list):
     return ds
 
 
-def getMetrics(y_true, y_obs):
+def getMetrics(y_true, y_pred):
     return _getTables(
         y_true,
-        y_obs,
+        y_pred,
         metrics_list=[
             AverageBias.LogMedianPredictionError(),
             AbsoluteDifference.MeanAbsoluteError(),
@@ -52,10 +52,10 @@ def getMetrics(y_true, y_obs):
     )
 
 
-def getConventionalMetrics(y_true, y_obs):
+def getConventionalMetrics(y_true, y_pred):
     return _getTables(
         y_true,
-        y_obs,
+        y_pred,
         metrics_list=[
             AverageBias.MeanPredictionError(),
             AbsoluteDifference.MeanAbsoluteError(),
@@ -67,10 +67,10 @@ def getConventionalMetrics(y_true, y_obs):
     )
 
 
-def getFullMetrics(y_true, y_obs):
+def getFullMetrics(y_true, y_pred):
     return _getTables(
         y_true,
-        y_obs,
+        y_pred,
         metrics_list=AverageBias._full
         + AbsoluteDifference._full
         + SquaredDifference._full
@@ -81,7 +81,7 @@ def getFullMetrics(y_true, y_obs):
     )
 
 
-def getFullMetricsSymmetric(y_true, y_obs):
+def getFullMetricsSymmetric(y_true, y_pred):
     full_list = (
         AverageBias._full
         + AbsoluteDifference._full
@@ -97,5 +97,4 @@ def getFullMetricsSymmetric(y_true, y_obs):
         if m.symmetry_bias == True or m.symmetry_dispersion == True:
             metrics_list.append(m)
 
-    return _getTables(y_true, y_obs, metrics_list=metrics_list)
-
+    return _getTables(y_true, y_pred, metrics_list=metrics_list)
